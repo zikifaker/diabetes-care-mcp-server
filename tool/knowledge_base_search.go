@@ -2,24 +2,42 @@ package tool
 
 import (
 	"context"
+	"diabetes-agent-mcp-server/config"
 	"diabetes-agent-mcp-server/dao"
 	"fmt"
 	"log/slog"
+	"net/http"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/milvus-io/milvus/client/v2/column"
+	"github.com/milvus-io/milvus/client/v2/entity"
+	"github.com/milvus-io/milvus/client/v2/milvusclient"
+	client "github.com/milvus-io/milvus/client/v2/milvusclient"
 	"github.com/mitchellh/mapstructure"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"github.com/tmc/langchaingo/embeddings"
+	"github.com/tmc/langchaingo/llms/openai"
 )
 
 const (
 	DefaultSearchResultLimit = 20
 	Neo4jFulltextName        = "fulltextSearch"
+
+	baseURL            = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+	embeddingModelName = "text-embedding-v4"
+	collectionName     = "knowledge_doc"
+)
+
+var (
+	embedder     embeddings.Embedder
+	milvusClient *milvusclient.Client
 )
 
 type KnowlegeGraphSearchResult struct {
 	Node          EntityNode `json:"node"`
 	Relationships []Relation `json:"relationships"`
-	Score         float64    `json:"score"`
+	Score         float32    `json:"score"`
 }
 
 type EntityNode struct {
@@ -33,6 +51,37 @@ type Relation struct {
 }
 
 type VectorDBSearchResult struct {
+	Chunk string    `json:"chunk"`
+	Score []float32 `json:"score"`
+}
+
+func init() {
+	client, err := openai.New(
+		openai.WithEmbeddingModel(embeddingModelName),
+		openai.WithToken(config.Cfg.Model.APIKey),
+		openai.WithBaseURL(baseURL),
+		openai.WithHTTPClient(&http.Client{
+			Timeout: 60 * time.Second,
+		}),
+	)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create embedder client: %v", err))
+	}
+
+	embedder, err = embeddings.NewEmbedder(client)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create embedder: %v", err))
+	}
+
+	milvusConfig := milvusclient.ClientConfig{
+		Address: config.Cfg.Milvus.Endpoint,
+		APIKey:  config.Cfg.Milvus.APIKey,
+	}
+
+	milvusClient, err = milvusclient.New(context.Background(), &milvusConfig)
+	if err != nil {
+		panic(fmt.Sprintf("failed to create milvus client: %v", err))
+	}
 }
 
 // SearchDiabetesKnowledgeBase 检索糖尿病知识库
@@ -123,7 +172,38 @@ func searchKnowledgeGraph(ctx context.Context, query string, limit int) ([]Knowl
 	return results, nil
 }
 
-// 检索向量存储（用户上传的知识文件）
-func searchVectorStore(ctx context.Context, query string, limit int) ([]map[string]any, error) {
-	return nil, nil
+// 检索向量存储（用户上传的知识文件的切片）
+func searchVectorStore(ctx context.Context, query string, limit int) ([]VectorDBSearchResult, error) {
+	vector, err := embedder.EmbedQuery(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error embedding query: %v", err)
+	}
+
+	searchOption := client.NewSearchOption(collectionName, limit, []entity.Vector{entity.FloatVector(vector)}).
+		WithOutputFields("text")
+
+	results, err := milvusClient.Search(ctx, searchOption)
+	if err != nil {
+		return nil, fmt.Errorf("error searching vector store: %v", err)
+	}
+
+	structedResults := make([]VectorDBSearchResult, 0, len(results))
+	for _, res := range results {
+		// 获取 text 字段内容
+		var text string
+		if textColumn := res.GetColumn("text"); textColumn != nil {
+			if content, ok := textColumn.(*column.ColumnVarChar); ok {
+				if content.Len() > 0 {
+					text, _ = content.GetAsString(0)
+				}
+			}
+		}
+
+		structedResults = append(structedResults, VectorDBSearchResult{
+			Chunk: text,
+			Score: res.Scores,
+		})
+	}
+
+	return structedResults, nil
 }

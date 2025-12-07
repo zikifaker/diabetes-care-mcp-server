@@ -20,9 +20,9 @@ func NewHTTPServer() *server.StreamableHTTPServer {
 	s.AddTool(
 		mcp.NewTool("diabetes_knowledge_base_search",
 			mcp.WithDescription(`
-				Search professional information about diabetes guidelines, 
-				medications, diagnostics, and treatments. Returns structured data 
-				from both knowledge graph (entities and relationships) and vector storage 
+				Search professional information about diabetes guidelines,
+				medications, diagnostics, and treatments. Returns structured data
+				from both knowledge graph (entities and relationships) and vector storage
 				(semantic text chunks). All results are sorted by relevance score in descending order.
 			`),
 			mcp.WithString("query",

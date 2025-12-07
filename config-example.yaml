@@ -8,3 +8,12 @@ db:
     port: 
     username: 
     password: 
+
+milvus:
+  endpoint: 
+  api_key: 
+  username: 
+  password: 
+
+model:
+  api_key: 

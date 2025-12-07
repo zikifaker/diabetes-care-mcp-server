@@ -17,6 +17,13 @@ type Config struct {
 	DB struct {
 		Neo4j DBConfig `yaml:"neo4j"`
 	} `yaml:"db"`
+	Milvus struct {
+		Endpoint string `yaml:"endpoint"`
+		APIKey   string `yaml:"api_key"`
+	} `yaml:"milvus"`
+	Model struct {
+		APIKey string `yaml:"api_key"`
+	} `yaml:"model"`
 }
 
 type DBConfig struct {
