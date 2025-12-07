@@ -134,8 +134,8 @@ func saveDocument(ctx context.Context, driver neo4j.DriverWithContext, doc Docum
 
 func saveDocumentNode(tx neo4j.ManagedTransaction, doc Document) error {
 	query := `
-    MERGE (d:Document {doc_id: $doc_id})
-    RETURN d
+		MERGE (d:Document {doc_id: $doc_id})
+		RETURN d
     `
 	_, err := tx.Run(context.Background(), query, map[string]any{
 		"doc_id": doc.DocID,
@@ -145,10 +145,10 @@ func saveDocumentNode(tx neo4j.ManagedTransaction, doc Document) error {
 
 func saveParagraphNode(tx neo4j.ManagedTransaction, docID string, para Paragraph) error {
 	query := `
-    MATCH (d:Document {doc_id: $doc_id})
-    MERGE (p:Paragraph {paragraph_id: $para_id})
-    SET p.text = $text
-    MERGE (d)-[:CONTAINS_PARAGRAPH]->(p)
+		MATCH (d:Document {doc_id: $doc_id})
+		MERGE (p:Paragraph {paragraph_id: $para_id})
+		SET p.text = $text
+		MERGE (d)-[:CONTAINS_PARAGRAPH]->(p)
     `
 	if _, err := tx.Run(context.Background(), query, map[string]any{
 		"doc_id":  docID,
@@ -169,10 +169,10 @@ func saveParagraphNode(tx neo4j.ManagedTransaction, docID string, para Paragraph
 
 func saveSentenceNode(tx neo4j.ManagedTransaction, paraID string, sentence Sentence) error {
 	query := `
-    MATCH (p:Paragraph {paragraph_id: $para_id})
-    MERGE (s:Sentence {sentence_id: $sentence_id})
-    SET s.text = $text
-    MERGE (p)-[:CONTAINS_SENTENCE]->(s)
+		MATCH (p:Paragraph {paragraph_id: $para_id})
+		MERGE (s:Sentence {sentence_id: $sentence_id})
+		SET s.text = $text
+		MERGE (p)-[:CONTAINS_SENTENCE]->(s)
     `
 	if _, err := tx.Run(context.Background(), query, map[string]any{
 		"para_id":     paraID,
@@ -199,11 +199,11 @@ func saveSentenceNode(tx neo4j.ManagedTransaction, paraID string, sentence Sente
 
 func saveEntityNode(tx neo4j.ManagedTransaction, sentenceID string, entity Entity) error {
 	query := `
-    MATCH (s:Sentence {sentence_id: $sentence_id})
-    MERGE (e:Entity {entity_id: $entity_id})
-    SET e.name = $name,
-        e.type = $type
-    MERGE (s)-[:CONTAINS_ENTITY]->(e)
+		MATCH (s:Sentence {sentence_id: $sentence_id})
+		MERGE (e:Entity {entity_id: $entity_id})
+		SET e.name = $name,
+			e.type = $type
+		MERGE (s)-[:CONTAINS_ENTITY]->(e)
     `
 	_, err := tx.Run(context.Background(), query, map[string]any{
 		"sentence_id": sentenceID,
@@ -219,11 +219,11 @@ func saveEntityNode(tx neo4j.ManagedTransaction, sentenceID string, entity Entit
 
 func saveRelation(tx neo4j.ManagedTransaction, relation Relation) error {
 	query := fmt.Sprintf(`
-    MATCH (e1:Entity {entity_id: $head_id})
-    MATCH (e2:Entity {entity_id: $tail_id})
-    MERGE (e1)-[r:%s]->(e2)
-    SET r.relation_id = $relation_id
-    `, relation.RelationType)
+		MATCH (e1:Entity {entity_id: $head_id})
+		MATCH (e2:Entity {entity_id: $tail_id})
+		MERGE (e1)-[r:%s]->(e2)
+		SET r.relation_id = $relation_id
+	`, relation.RelationType)
 
 	_, err := tx.Run(context.Background(), query, map[string]interface{}{
 		"head_id":     relation.HeadEntityID,
@@ -243,10 +243,10 @@ func checkFullTextIndex(ctx context.Context, driver neo4j.DriverWithContext) err
 	defer s.Close(ctx)
 
 	check := `
-	SHOW FULLTEXT INDEXES
-	YIELD name
-	WHERE name = $name
-	RETURN count(*) AS count
+		SHOW FULLTEXT INDEXES
+		YIELD name
+		WHERE name = $name
+		RETURN count(*) AS count
 	`
 	res, err := s.Run(ctx, check, map[string]any{"name": tool.Neo4jFulltextName})
 	if err != nil {
@@ -270,9 +270,7 @@ func checkFullTextIndex(ctx context.Context, driver neo4j.DriverWithContext) err
 	}
 
 	// 在 Entity 节点的 name 和 type 属性上建立全文索引
-	create := fmt.Sprintf(`
-	CREATE FULLTEXT INDEX %s FOR (n:Entity) ON EACH [n.name, n.type]
-	`, tool.Neo4jFulltextName)
+	create := fmt.Sprintf(`CREATE FULLTEXT INDEX %s FOR (n:Entity) ON EACH [n.name, n.type]`, tool.Neo4jFulltextName)
 
 	_, err = s.Run(ctx, create, nil)
 	if err != nil {

@@ -19,9 +19,20 @@ func NewHTTPServer() *server.StreamableHTTPServer {
 
 	s.AddTool(
 		mcp.NewTool("diabetes_knowledge_base_search",
-			mcp.WithDescription("search professional information about diabetes guidelines, medications, diagnostics, and treatments"),
-			mcp.WithString("query", mcp.Required(), mcp.Description("search query")),
-			mcp.WithNumber("limit", mcp.DefaultNumber(tool.DefaultSearchResultLimit), mcp.Description("search result limit, you'd better use an even number")),
+			mcp.WithDescription(`
+				Search professional information about diabetes guidelines, 
+				medications, diagnostics, and treatments. Returns structured data 
+				from both knowledge graph (entities and relationships) and vector storage 
+				(semantic text chunks). All results are sorted by relevance score in descending order.
+			`),
+			mcp.WithString("query",
+				mcp.Required(),
+				mcp.Description("Search query string"),
+			),
+			mcp.WithNumber("limit",
+				mcp.DefaultNumber(tool.DefaultSearchResultLimit),
+				mcp.Description("An even number of results to return (recommended between 10-50)"),
+			),
 		),
 		tool.SearchDiabetesKnowledgeBase,
 	)
