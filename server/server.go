@@ -17,13 +17,18 @@ func NewHTTPServer() *server.StreamableHTTPServer {
 		server.WithToolCapabilities(true),
 	)
 
+	addTools(s)
+
+	return server.NewStreamableHTTPServer(s)
+}
+
+func addTools(s *server.MCPServer) {
 	s.AddTool(
-		mcp.NewTool("diabetes_knowledge_base_search",
+		mcp.NewTool("diabetes_knowledge_graph",
 			mcp.WithDescription(`
-				Search professional information about diabetes guidelines,
-				medications, diagnostics, and treatments. Returns structured data
-				from both knowledge graph (entities and relationships) and vector storage
-				(semantic text chunks). All results are sorted by relevance score in descending order.
+				Search professional information about diabetes guidelines, medications, diagnostics, and treatments. 
+				Returns structured data from knowledge graph (entities and relationships). 
+				All results are sorted by relevance score in descending order.
 			`),
 			mcp.WithString("query",
 				mcp.Required(),
@@ -31,11 +36,27 @@ func NewHTTPServer() *server.StreamableHTTPServer {
 			),
 			mcp.WithNumber("limit",
 				mcp.DefaultNumber(tool.DefaultSearchResultLimit),
-				mcp.Description("An even number of results to return (recommended between 10-50)"),
+				mcp.Description("An even number of results to return (recommended between 10-20)"),
 			),
 		),
-		tool.SearchDiabetesKnowledgeBase,
+		tool.SearchDiabetesKnowledgeGraph,
 	)
 
-	return server.NewStreamableHTTPServer(s)
+	s.AddTool(
+		mcp.NewTool("user_knowledge_base",
+			mcp.WithDescription(`
+				Search the user's private knowledge base containing personal documents and information across various domains. 
+				Use this tool when you need to find specific information from the user's personal knowledge collection, 
+				especially when general knowledge is insufficient.`),
+			mcp.WithString("query",
+				mcp.Required(),
+				mcp.Description("Search query string"),
+			),
+			mcp.WithNumber("limit",
+				mcp.DefaultNumber(tool.DefaultSearchResultLimit),
+				mcp.Description("Number of results to return (recommended between 10-20)"),
+			),
+		),
+		tool.SearchUserKnowledgeBase,
+	)
 }
