@@ -1,4 +1,4 @@
-# Binaries and executables
+# 二进制文件和可执行文件
 *.exe
 *.exe~
 *.dll
@@ -7,13 +7,13 @@
 *.out
 *.test
 
-# Dependency directories
+# 依赖目录
 vendor/
 
-# Go workspace file
+# Go 工作区文件
 go.work
 
-# IDE specific files
+# IDE 特定文件
 .idea/
 .vscode/
 *.swp
@@ -21,22 +21,22 @@ go.work
 *.swn
 *.swo
 
-# Environment files
+# 环境文件
 .env
 .env.local
 .env.*.local
 
-# Logs and databases
+# 日志和数据库
 *.log
 *.sql
 *.sqlite
 
-# Build output
+# 构建输出
 bin/
 dist/
 build/
 
-# OS generated files
+# 操作系统生成的文件
 .DS_Store
 .DS_Store?
 ._*
@@ -45,35 +45,35 @@ build/
 ehthumbs.db
 Thumbs.db
 
-# Local development configuration
+# 本地开发配置
 config/local.*
 
-# Debug files
+# 调试文件
 debug/
 
-# Test output
+# 测试输出
 coverage.out
 coverage.html
 
-# Project specific
+# 项目特定文件
 config.yaml
 resource/diakg
 
-# Go build cache
+# Go 构建缓存
 /.cache/
 
-# IDE specific
+# IDE 特定文件
 .idea_modules/
 *.iml
 *.iws
 *.ipr
 
-# Local development environment
+# 本地开发环境
 .venv/
 venv/
 ENV/
 
-# Editor directories and files
+# 编辑器目录和文件
 .idea
 *.suo
 *.ntvs*
