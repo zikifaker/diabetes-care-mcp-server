@@ -81,7 +81,10 @@ func main() {
 		slog.Info("Processing file", "file", file)
 		err = processFile(ctx, driver, file)
 		if err != nil {
-			slog.Error("Error processing file", "file", file, "err", err)
+			slog.Error("Error processing file",
+				"file", file,
+				"err", err,
+			)
 			return
 		}
 	}

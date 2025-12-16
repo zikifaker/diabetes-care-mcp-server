@@ -50,7 +50,10 @@ func validateToken(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil || !token.Valid {
-		slog.Info("Invalid token", "err", err, "user_email", claims.UserEmail)
+		slog.Info("Invalid token",
+			"user_email", claims.UserEmail,
+			"err", err,
+		)
 		return nil, fmt.Errorf("invalid token")
 	}
 
