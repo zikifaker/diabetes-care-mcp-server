@@ -14,9 +14,15 @@ const (
 )
 
 func NewHTTPServer() *server.StreamableHTTPServer {
+	hooks := &server.Hooks{}
+
+	// 注册工具调用成功后将调用结果推送给客户端的 hook
+	hooks.AddAfterCallTool(pushCallToolResult)
+
 	s := server.NewMCPServer(serverName, serverVersion,
 		server.WithToolCapabilities(true),
 		server.WithToolHandlerMiddleware(middleware.AuthMiddleware),
+		server.WithHooks(hooks),
 	)
 
 	addTools(s)
