@@ -3,6 +3,7 @@ package tools
 import (
 	"context"
 	"diabetes-agent-mcp-server/config"
+	"diabetes-agent-mcp-server/dao"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -11,23 +12,18 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/milvus-io/milvus/client/v2/column"
 	"github.com/milvus-io/milvus/client/v2/entity"
-	"github.com/milvus-io/milvus/client/v2/milvusclient"
 	client "github.com/milvus-io/milvus/client/v2/milvusclient"
 	"github.com/tmc/langchaingo/embeddings"
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
 const (
-	baseURL                  = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-	embeddingModelName       = "text-embedding-v4"
-	collectionName           = "knowledge_doc"
-	defaultSearchResultLimit = 20
+	baseURL            = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+	embeddingModelName = "text-embedding-v4"
+	collectionName     = "knowledge_doc"
 )
 
-var (
-	embedder     embeddings.Embedder
-	milvusClient *milvusclient.Client
-)
+var embedder embeddings.Embedder
 
 type VectorDBSearchResult struct {
 	Chunk string  `json:"chunk"`
@@ -50,16 +46,6 @@ func init() {
 	embedder, err = embeddings.NewEmbedder(client)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to create embedder: %v", err))
-	}
-
-	milvusConfig := milvusclient.ClientConfig{
-		Address: config.Cfg.Milvus.Endpoint,
-		APIKey:  config.Cfg.Milvus.APIKey,
-	}
-
-	milvusClient, err = milvusclient.New(context.Background(), &milvusConfig)
-	if err != nil {
-		panic(fmt.Sprintf("failed to create milvus client: %v", err))
 	}
 }
 
@@ -101,7 +87,7 @@ func retrieveSimilarDocuments(ctx context.Context, query string, limit int) ([]V
 		WithOutputFields("text").
 		WithFilter("user_email == '" + userEmail + "'")
 
-	resultSets, err := milvusClient.Search(ctx, searchOption)
+	resultSets, err := dao.MilvusClient.Search(ctx, searchOption)
 	if err != nil {
 		return nil, fmt.Errorf("error searching vector store: %v", err)
 	}

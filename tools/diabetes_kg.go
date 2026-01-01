@@ -12,7 +12,11 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
-const Neo4jFulltextIndexName = "fulltext_index_entity_name"
+const (
+	Neo4jFulltextIndexName = "fulltext_index_entity_name"
+
+	defaultSearchResultLimit = 20
+)
 
 type KnowlegeGraphSearchResult struct {
 	Node          EntityNode `json:"node"`
