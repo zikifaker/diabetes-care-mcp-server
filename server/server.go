@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	serverName    = "Diabetes Knowledge Search MCP Server"
+	serverName    = "Diabetes Care MCP Server"
 	serverVersion = "1.0.0"
 )
 
@@ -20,7 +20,7 @@ var searchDiabetesKGQueryDesc string
 func NewHTTPServer() *server.StreamableHTTPServer {
 	hooks := &server.Hooks{}
 
-	// 注册工具调用成功后将调用结果推送给客户端的 hook
+	// 注册 hook，推送工具调用结果
 	hooks.AddAfterCallTool(pushCallToolResult)
 
 	s := server.NewMCPServer(serverName, serverVersion,
@@ -53,24 +53,5 @@ func registerTools(s *server.MCPServer) {
 			),
 		),
 		tools.SearchDiabetesKnowledgeGraph,
-	)
-
-	s.AddTool(
-		mcp.NewTool("search_user_knowledge_base",
-			mcp.WithDescription(`
-				Search the user's private knowledge base containing personal documents and information across various domains. 
-				Use this tool when you need to find specific information from the user's personal knowledge collection, especially when general knowledge is insufficient.
-			`),
-			mcp.WithString("query",
-				mcp.Required(),
-				mcp.Description("Professionally crafted diabetes-related query for RAG system, including key medical terminology and clinical context"),
-			),
-			mcp.WithNumber("limit",
-				mcp.Min(10),
-				mcp.Max(20),
-				mcp.Description("Number of results to return"),
-			),
-		),
-		tools.SearchUserKnowledgeBase,
 	)
 }

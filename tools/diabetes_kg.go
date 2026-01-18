@@ -41,7 +41,7 @@ func SearchDiabetesKnowledgeGraph(ctx context.Context, req mcp.CallToolRequest) 
 		return &mcp.CallToolResult{
 			Content: []mcp.Content{
 				mcp.TextContent{
-					Text: "required query param",
+					Text: "query param is required",
 				},
 			},
 			IsError: true,
