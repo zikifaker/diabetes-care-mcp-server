@@ -7,9 +7,14 @@ import (
 	"time"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
-var Driver neo4j.DriverWithContext
+var (
+	Driver neo4j.DriverWithContext
+	DB     *gorm.DB
+)
 
 // 初始化 Neo4j 连接
 func init() {
@@ -29,5 +34,23 @@ func init() {
 
 	if err := Driver.VerifyConnectivity(ctx); err != nil {
 		panic(fmt.Sprintf("Failed to connect to Neo4j server: %v", err))
+	}
+}
+
+func init() {
+	dbConfig := config.Cfg.DB.MySQL
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbConfig.Username,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.DBName,
+	)
+
+	var err error
+	DB, err = gorm.Open(mysql.Open(dsn))
+	if err != nil {
+		panic(fmt.Sprintf("Failed to connect database: %v", err))
 	}
 }

@@ -49,9 +49,25 @@ func registerTools(s *server.MCPServer) {
 			mcp.WithNumber("limit",
 				mcp.Min(10),
 				mcp.Max(20),
-				mcp.Description("Number of results to return"),
+				mcp.Description("Number of results to return (10-20)"),
 			),
 		),
 		tools.SearchDiabetesKnowledgeGraph,
+	)
+
+	s.AddTool(
+		mcp.NewTool("get_blood_glucose_records",
+			mcp.WithDescription(`
+				Retrieve the user's recent blood glucose measurements.
+				Returns blood glucose records including blood glucose value, measured time, and dining status at measurement.
+			`),
+			mcp.WithString("limit",
+				mcp.Required(),
+				mcp.Min(10),
+				mcp.Max(100),
+				mcp.Description("Number of most recent records to return (10-100)"),
+			),
+		),
+		tools.GetBloodGlucoseRecords,
 	)
 }

@@ -16,11 +16,8 @@ type Config struct {
 	}
 	DB struct {
 		Neo4j DBConfig `yaml:"neo4j"`
+		MySQL DBConfig `yaml:"mysql"`
 	} `yaml:"db"`
-	Milvus struct {
-		Endpoint string `yaml:"endpoint"`
-		APIKey   string `yaml:"api_key"`
-	} `yaml:"milvus"`
 	Model struct {
 		APIKey string `yaml:"api_key"`
 	} `yaml:"model"`
@@ -34,6 +31,7 @@ type DBConfig struct {
 	Port     string `yaml:"port"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	DBName   string `yaml:"db_name"`
 }
 
 func init() {
