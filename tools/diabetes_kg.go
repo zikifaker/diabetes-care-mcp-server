@@ -56,7 +56,7 @@ func SearchDiabetesKnowledgeGraph(ctx context.Context, req mcp.CallToolRequest) 
 		slog.Error("Failed to search knowledge graph", "err", err)
 	}
 
-	slog.Debug("searched knowledge graph", "results", results)
+	// slog.Debug("searched knowledge graph", "results", results)
 
 	return mcp.NewToolResultJSON(results)
 }
@@ -66,32 +66,31 @@ func executeFulltextSearch(ctx context.Context, keywords []string, limit int) ([
 	session := dao.Driver.NewSession(ctx, neo4j.SessionConfig{AccessMode: neo4j.AccessModeRead})
 	defer session.Close(ctx)
 
-	// 构建模糊查询条件
-	var conditions []string
-	for _, keyword := range keywords {
-		// 转义单引号，防止 SQL 注入
-		keyword = strings.ReplaceAll(keyword, "'", "\\'")
-		conditions = append(conditions, fmt.Sprintf("node.name CONTAINS '%s'", keyword))
+	keywords = cleanKeywords(keywords)
+	if len(keywords) == 0 {
+		return nil, fmt.Errorf("valid keywords not found")
 	}
-	query := strings.Join(conditions, " OR ")
+
+	// 构建模糊查询条件
+	query := strings.Join(keywords, " OR ")
 
 	// 返回匹配查询且至少存在一个关系的节点
 	cypherQuery := `
-		CALL db.index.fulltext.queryNodes($indexName, $query) 
-		YIELD node, score
-		WHERE 'Entity' IN labels(node)
-		WITH node, score, [(node)-[r]-(related:Entity) | {
-			type: type(r),
-			related: related {.name, .type}
-		}] AS relationships
-		WHERE size(relationships) > 0
-		RETURN 
-			node {.name, .type} AS node,
-			relationships,
-			score
-		ORDER BY score DESC
-		LIMIT $limit
-	`
+        CALL db.index.fulltext.queryNodes($indexName, $query) 
+        YIELD node, score
+        WHERE 'Entity' IN labels(node)
+        MATCH (node)-[r]-(related:Entity)
+        WITH node, score, collect({
+            type: type(r),
+            related: related {.name, .type}
+        }) AS relationships
+        RETURN 
+            node {.name, .type} AS node,
+            relationships,
+            score
+        ORDER BY score DESC
+        LIMIT $limit
+    `
 
 	result, err := session.Run(ctx, cypherQuery, map[string]any{
 		"indexName": Neo4jFulltextIndexName,
@@ -117,4 +116,30 @@ func executeFulltextSearch(ctx context.Context, keywords []string, limit int) ([
 	}
 
 	return results, nil
+}
+
+func cleanKeywords(keywords []string) []string {
+	var escapedKeywords []string
+	for _, k := range keywords {
+		if k == "" {
+			continue
+		}
+		cleanK := sanitizeLuceneQuery(k)
+		if cleanK != "" {
+			escapedKeywords = append(escapedKeywords, cleanK)
+		}
+	}
+	return escapedKeywords
+}
+
+// 转义 Lucene 保留字符
+func sanitizeLuceneQuery(query string) string {
+	replacer := strings.NewReplacer(
+		"+", "\\+", "-", "\\-", "&", "\\&", "|", "\\|",
+		"!", "\\!", "(", "\\(", ")", "\\)", "{", "\\{",
+		"}", "\\}", "[", "\\[", "]", "\\]", "^", "\\^",
+		"\"", "\\\"", "~", "\\~", "*", "\\*", "?", "\\?",
+		":", "\\:", "\\", "\\\\", "/", "\\/",
+	)
+	return replacer.Replace(query)
 }
