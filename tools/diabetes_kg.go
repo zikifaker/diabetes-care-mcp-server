@@ -56,8 +56,6 @@ func SearchDiabetesKnowledgeGraph(ctx context.Context, req mcp.CallToolRequest) 
 		slog.Error("Failed to search knowledge graph", "err", err)
 	}
 
-	// slog.Debug("searched knowledge graph", "results", results)
-
 	return mcp.NewToolResultJSON(results)
 }
 

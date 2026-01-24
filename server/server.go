@@ -61,7 +61,7 @@ func registerTools(s *server.MCPServer) {
 				Retrieve the user's recent blood glucose measurements.
 				Returns blood glucose records including blood glucose value, measured time, and dining status at measurement.
 			`),
-			mcp.WithString("limit",
+			mcp.WithNumber("limit",
 				mcp.Required(),
 				mcp.Min(10),
 				mcp.Max(100),
@@ -69,5 +69,15 @@ func registerTools(s *server.MCPServer) {
 			),
 		),
 		tools.GetBloodGlucoseRecords,
+	)
+
+	s.AddTool(
+		mcp.NewTool("get_health_profile",
+			mcp.WithDescription(`
+				Retrieve the user's comprehensive health profile information.
+				Returns the user's diabetes type, medical history, and complication status.
+			`),
+		),
+		tools.GetHealthProfile,
 	)
 }
