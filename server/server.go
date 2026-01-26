@@ -74,8 +74,10 @@ func registerTools(s *server.MCPServer) {
 	s.AddTool(
 		mcp.NewTool("get_health_profile",
 			mcp.WithDescription(`
-				Retrieve the user's comprehensive health profile information.
-				Returns the user's diabetes type, medical history, and complication status.
+				Retrieve the user's health profile:
+				- **basic info**: gender, age, height, weight
+				- **lifestyle**: dietary preference, smoking status, activity level
+				- **diabetes details**: type, diagnosis year, therapy mode, medication, allergies, complications
 			`),
 		),
 		tools.GetHealthProfile,

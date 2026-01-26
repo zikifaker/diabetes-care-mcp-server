@@ -9,7 +9,10 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
-const defaultGetBloodGlucoseRecordsLimit = 30
+const (
+	bloodGlucoseRecordTableName        = "blood_glucose_record"
+	defaultGetBloodGlucoseRecordsLimit = 30
+)
 
 type BloodGlucoseRecord struct {
 	Value        float32   `json:"value"`
@@ -22,7 +25,7 @@ func GetBloodGlucoseRecords(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	email := ctx.Value("user_email").(string)
 
 	var records []BloodGlucoseRecord
-	err := dao.DB.Table("blood_glucose_record").
+	err := dao.DB.Table(bloodGlucoseRecordTableName).
 		Select("value, measured_at, dining_status").
 		Where("user_email = ?", email).
 		Order("measured_at DESC").
