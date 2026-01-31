@@ -38,14 +38,7 @@ type Relation struct {
 func SearchDiabetesKnowledgeGraph(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	query := req.GetString("query", "")
 	if query == "" {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				mcp.TextContent{
-					Text: "query param is required",
-				},
-			},
-			IsError: true,
-		}, nil
+		return mcp.NewToolResultError("query param is required"), nil
 	}
 
 	keywords := strings.Split(query, " ")

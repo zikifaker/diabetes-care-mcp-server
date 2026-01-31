@@ -16,7 +16,6 @@ var (
 	DB     *gorm.DB
 )
 
-// 初始化 Neo4j 连接
 func init() {
 	dsn := fmt.Sprintf("neo4j://%s:%s", config.Cfg.DB.Neo4j.Host, config.Cfg.DB.Neo4j.Port)
 

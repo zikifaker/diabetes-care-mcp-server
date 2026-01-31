@@ -48,38 +48,27 @@ func registerTools(s *server.MCPServer) {
 			),
 			mcp.WithNumber("limit",
 				mcp.Min(10),
-				mcp.Max(20),
-				mcp.Description("Number of results to return (10-20)"),
+				mcp.Max(30),
+				mcp.Description("Number of results to return (10-30)"),
 			),
 		),
 		tools.SearchDiabetesKnowledgeGraph,
 	)
 
 	s.AddTool(
-		mcp.NewTool("get_blood_glucose_records",
-			mcp.WithDescription(`
-				Retrieve the user's recent blood glucose measurements.
-				Returns blood glucose records including blood glucose value, measured time, and dining status at measurement.
-			`),
-			mcp.WithNumber("limit",
+		mcp.NewTool("fetch_health_data",
+			mcp.WithDescription("Get user health data including blood glucose records, health profile, and exercise records."),
+			mcp.WithString("type",
 				mcp.Required(),
+				mcp.Enum("blood_glucose", "health_profile", "exercise_records"),
+				mcp.Description("Type of health data to retrieve"),
+			),
+			mcp.WithNumber("limit",
+				mcp.Description("Number of most recent records to return (10-100, only for blood_glucose and exercise_records)"),
 				mcp.Min(10),
 				mcp.Max(100),
-				mcp.Description("Number of most recent records to return (10-100)"),
 			),
 		),
-		tools.GetBloodGlucoseRecords,
-	)
-
-	s.AddTool(
-		mcp.NewTool("get_health_profile",
-			mcp.WithDescription(`
-				Retrieve the user's health profile:
-				- **basic info**: gender, age, height, weight
-				- **lifestyle**: dietary preference, smoking status, activity level
-				- **diabetes details**: type, diagnosis year, therapy mode, medication, allergies, complications
-			`),
-		),
-		tools.GetHealthProfile,
+		tools.FetchHealthData,
 	)
 }
