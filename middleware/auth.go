@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"diabetes-agent-mcp-server/config"
+	"diabetes-care-mcp-server/config"
 	"fmt"
 	"log/slog"
 	"strings"

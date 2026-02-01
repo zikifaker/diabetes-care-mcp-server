@@ -1,8 +1,8 @@
 package server
 
 import (
-	"diabetes-agent-mcp-server/middleware"
-	"diabetes-agent-mcp-server/tools"
+	"diabetes-care-mcp-server/middleware"
+	"diabetes-care-mcp-server/tools"
 	_ "embed"
 
 	"github.com/mark3labs/mcp-go/mcp"

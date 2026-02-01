@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"diabetes-agent-mcp-server/config"
-	"diabetes-agent-mcp-server/tools"
+	"diabetes-care-mcp-server/config"
+	"diabetes-care-mcp-server/tools"
 	"encoding/json"
 	"fmt"
 	"log/slog"

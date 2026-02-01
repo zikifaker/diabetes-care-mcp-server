@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"diabetes-agent-mcp-server/config"
-	"diabetes-agent-mcp-server/dao"
-	"diabetes-agent-mcp-server/server"
+	"diabetes-care-mcp-server/config"
+	"diabetes-care-mcp-server/dao"
+	"diabetes-care-mcp-server/server"
 	"log/slog"
 	"os"
 )

@@ -1,4 +1,4 @@
-module diabetes-agent-mcp-server
+module diabetes-care-mcp-server
 
 go 1.24.6
 

@@ -2,7 +2,7 @@ package tools
 
 import (
 	"context"
-	"diabetes-agent-mcp-server/dao"
+	"diabetes-care-mcp-server/dao"
 	"log/slog"
 	"time"
 

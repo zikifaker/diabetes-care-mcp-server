@@ -2,7 +2,7 @@ package dao
 
 import (
 	"context"
-	"diabetes-agent-mcp-server/config"
+	"diabetes-care-mcp-server/config"
 	"fmt"
 	"time"
 
