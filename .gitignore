@@ -1,82 +1,28 @@
-# 二进制文件和可执行文件
+# Go
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-*.out
 *.test
-
-# 依赖目录
+*.out
+go.work
 vendor/
 
-# Go 工作区文件
-go.work
-
-# IDE 特定文件
-.idea/
+# VSCode
 .vscode/
-*.swp
-*.swo
-*.swn
-*.swo
+*.code-workspace
+.history/
 
-# 环境文件
-.env
-.env.local
-.env.*.local
-
-# 日志和数据库
-*.log
-*.sql
-*.sqlite
-
-# 构建输出
-bin/
-dist/
-build/
-
-# 操作系统生成的文件
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# 本地开发配置
-config/local.*
-
-# 调试文件
-debug/
-
-# 测试输出
-coverage.out
-coverage.html
-
-# 项目特定文件
-config.yaml
-resource/diakg
-
-# Go 构建缓存
-/.cache/
-
-# IDE 特定文件
-.idea_modules/
+# IntelliJ IDEA
+.idea/
 *.iml
 *.iws
 *.ipr
+out/
+.idea_modules/
 
-# 本地开发环境
-.venv/
-venv/
-ENV/
 
-# 编辑器目录和文件
-.idea
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Custom Rules
+config.yaml
+resource/diakg
