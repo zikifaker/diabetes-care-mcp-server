@@ -114,7 +114,7 @@ func getExerciseRecords(ctx context.Context, email string, limit int) []Exercise
 	err := dao.DB.Table(exerciseRecordTableName).
 		Select("type, name, intensity, start_at, end_at, duration, pre_glucose, post_glucose, notes").
 		Where("user_email = ?", email).
-		Order("measured_at DESC").
+		Order("start_at DESC").
 		Limit(limit).
 		Find(&records).Error
 	if err != nil {
